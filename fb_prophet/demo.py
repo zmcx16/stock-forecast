@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from prophet import Prophet
+from sklearn import metrics
 
 
 def get_prophet_data(stock_path):
@@ -62,11 +63,19 @@ def main():
     forecast_with_org_data['yhat'] = np.exp(forecast_with_org_data.yhat)
     forecast_with_org_data['yhat_upper'] = np.exp(forecast_with_org_data.yhat_upper)
     forecast_with_org_data['yhat_lower'] = np.exp(forecast_with_org_data.yhat_lower)
-    forecast_with_org_data[['y', 'yhat']].plot(figsize=(8, 6))
+    forecast_with_org_data[['y', 'yhat', 'yhat_upper', 'yhat_lower']].plot(figsize=(8, 6))
     print(forecast_with_org_data)
-    plt.show()
 
     forecast_with_org_data_dropna = forecast_with_org_data.dropna()
+    forecast_with_org_data_dropna[['y', 'yhat']].plot(figsize=(8, 6))
+
+    # plt.show()
+
+    ae = (forecast_with_org_data_dropna['yhat'] - forecast_with_org_data_dropna['y'])
+    print(ae.describe())
+
+    print("MSE:", metrics.mean_squared_error(forecast_with_org_data_dropna['yhat'], forecast_with_org_data_dropna['y']))
+    print("MAE:", metrics.mean_absolute_error(forecast_with_org_data_dropna['yhat'], forecast_with_org_data_dropna['y']))
 
 
 if __name__ == "__main__":
