@@ -21,17 +21,7 @@ from datetime import datetime, timedelta
 
 from models.fb_prophet import LibFBProphet
 
-forecast_periods = 30
-
-
-def get_all_stock_symbol(stat_path):
-    symbol_list = []
-    with open(stat_path, 'r', encoding='utf-8') as f:
-        stat = json.loads(f.read())
-        for symbol in stat:
-            symbol_list.append(symbol)
-
-    return symbol_list
+train_ratio = 0.9
 
 
 def prepare_model_data_for_stock(stock_path, name):
@@ -39,7 +29,7 @@ def prepare_model_data_for_stock(stock_path, name):
         data = {
             'args': {
                 'using_regressors': ['Open', 'High', 'Low', 'Volume'],
-                'forecast_periods': forecast_periods
+                'train_ratio': train_ratio
             },
             'target_data': {
                 'name': name,
@@ -63,17 +53,13 @@ def main():
 
     model = LibFBProphet()
 
-    symbol_list = get_all_stock_symbol(stock_stat_path)
-    logging.info(symbol_list)
-
     # do fb_prophet forecast for single stock data
-    for symbol in symbol_list:
-        stock_path = stock_historical_path / ('T' + ".json")
-        stock_data = prepare_model_data_for_stock(stock_path, symbol)
-        logging.debug(stock_data)
-        break
+    symbol = 'T'
+    stock_path = stock_historical_path / (symbol + ".json")
+    stock_data = prepare_model_data_for_stock(stock_path, symbol)
+    logging.debug(stock_data)
 
-    model.run_predict(stock_data)
+    model.run_validate(stock_data)
 
 
 if __name__ == "__main__":

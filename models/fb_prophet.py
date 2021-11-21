@@ -1,3 +1,5 @@
+import os
+import logging
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,109 +9,159 @@ from sklearn import metrics
 from models.model_abc import Model
 
 
+# https://github.com/facebook/prophet/issues/223
+class suppress_stdout_stderr(object):
+    '''
+    A context manager for doing a "deep suppression" of stdout and stderr in
+    Python, i.e. will suppress all print, even if the print originates in a
+    compiled C/Fortran sub-function.
+       This will not suppress raised exceptions, since exceptions are printed
+    to stderr just before a script exits, and after the context manager has
+    exited (at least, I think that is why it lets exceptions through).
+
+    '''
+    def __init__(self):
+        # Open a pair of null files
+        self.null_fds = [os.open(os.devnull, os.O_RDWR) for x in range(2)]
+        # Save the actual stdout (1) and stderr (2) file descriptors.
+        self.save_fds = (os.dup(1), os.dup(2))
+
+    def __enter__(self):
+        # Assign the null pointers to stdout and stderr.
+        os.dup2(self.null_fds[0], 1)
+        os.dup2(self.null_fds[1], 2)
+
+    def __exit__(self, *_):
+        # Re-assign the real stdout/stderr back to (1) and (2)
+        os.dup2(self.save_fds[0], 1)
+        os.dup2(self.save_fds[1], 2)
+        # Close the null files
+        os.close(self.null_fds[0])
+        os.close(self.null_fds[1])
+
+
 class LibFBProphet(Model):
 
-    def run(self, data, forecast_periods=30):
-        # data = {
-        #       'target_data': {
-        #           'name': 'name'
-        #           'data': obj      # dataframe
-        #           'type': 'stock'  # stock or market
-        #       },
-        #       'feature_data': [
-        #           {
-        #               'name': 'name'
-        #               'data': obj      # dataframe
-        #               'type': 'stock'  # stock or market
-        #           }
-        #       ]
-        #   }
-        regressors = {}
+    enable_plot = False
+    train_ratio = 0.9
 
+    def __init__(self):
+        logging.getLogger('fbprophet').setLevel(logging.WARNING)
+
+    # data = {
+    #       'args': {
+    #           'using_regressors': ['Open', 'High', 'Low', 'Volume']
+    #           'forecast_periods': 30 # use for run_predict
+    #           'training_ratio': 0.9 # use for run_validate
+    #       }
+    #       'target_data': {
+    #           'name': 'name'
+    #           'data': obj      # dataframe
+    #           'type': 'stock'  # stock or market
+    #       },
+    #       'feature_data': [
+    #           {
+    #               'name': 'name'
+    #               'data': obj      # dataframe
+    #               'type': 'stock'  # stock or market
+    #           }
+    #       ]
+    #   }
+
+    def run_validate(self, data):
+
+        logging.info(data['args'])
+        if 'enable_plot' in data['args']:
+            self.enable_plot = data['args']['enable_plot']
+        if 'train_ratio' in data['args']:
+            self.train_ratio = data['args']['train_ratio']
+
+        using_regressors = data['args']['using_regressors']
         name = data['target_data']['name']
         df = data['target_data']['data']
 
         df.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
 
-        trainsize = int(df.shape[0] * 0.9)
+        train_size = int(df.shape[0] * self.train_ratio)
+        train_data = df[0:train_size]
+        test_data = df[train_size:df.shape[0]]
 
-        o = LibFBProphet.__predict_single_var_future(df[['ds', 'Volume']].copy(), 'Volume', df.shape[0]-trainsize)
-        regressors[name+'_'+'Volume'] = pd.concat([df['Volume'], o], ignore_index=True)
+        forecast_with_org_data = self.__run_model(train_data, using_regressors, df.shape[0] - train_size, name)
 
-        o2 = LibFBProphet.__predict_single_var_future(df[['ds', 'Open']].copy(), 'Open', df.shape[0]-trainsize)
-        regressors[name+'_'+'Open'] = pd.concat([df['Open'], o2], ignore_index=True)
+        if self.enable_plot:
+            plt.show()
 
-        o3 = LibFBProphet.__predict_single_var_future(df[['ds', 'High']].copy(), 'High', df.shape[0]-trainsize)
-        regressors[name+'_'+'High'] = pd.concat([df['High'], o3], ignore_index=True)
+        logging.info("MSE: {}".format(
+              metrics.mean_squared_error(forecast_with_org_data['yhat'][train_size:df.shape[0]], test_data['y'])))
+        logging.info("MAE: {}".format(
+              metrics.mean_absolute_error(forecast_with_org_data['yhat'][train_size:df.shape[0]], test_data['y'])))
 
-        o4 = LibFBProphet.__predict_single_var_future(df[['ds', 'Low']].copy(), 'Low', df.shape[0]-trainsize)
-        regressors[name+'_'+'Low'] = pd.concat([df['Low'], o4], ignore_index=True)
+        return NotImplemented
 
+    def run_predict(self, data):
 
-        train = df[0:trainsize]
-        test = df[trainsize:df.shape[0]]
+        logging.info(data['args'])
+        if 'enable_plot' in data['args']:
+            self.enable_plot = data['args']['enable_plot']
 
-        df_log = df.copy()
+        using_regressors = data['args']['using_regressors']
+        forecast_periods = data['args']['forecast_periods']
+        name = data['target_data']['name']
+        df = data['target_data']['data']
 
-        df_log['y'] = np.log(df_log['y'])
-        df_log['Open'] = np.log(df_log['Open'])
-        df_log['High'] = np.log(df_log['High'])
-        df_log['Low'] = np.log(df_log['Low'])
-        df_log['Volume'] = np.log(df_log['Volume'])
+        df.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
 
-        df_log[name+'_'+'Volume'] = df_log['Volume']
-        df_log[name + '_' + 'Open'] = df_log['Open']
-        df_log[name + '_' + 'High'] = df_log['High']
-        df_log[name + '_' + 'Low'] = df_log['Low']
+        forecast_with_org_data = self.__run_model(df, using_regressors, forecast_periods, name)
 
+        if self.enable_plot:
+            plt.show()
+
+        logging.debug(forecast_with_org_data)
+
+        return NotImplemented
+
+    def __run_model(self, df_data, using_regressors, forecast_periods, name):
 
         m = Prophet()
-        m.add_regressor(name+'_'+'Volume')
-        m.add_regressor(name + '_' + 'Open')
-        m.add_regressor(name + '_' + 'High')
-        m.add_regressor(name + '_' + 'Low')
-        m.fit(df_log)
-        future = m.make_future_dataframe(periods=df.shape[0]-trainsize)
-        future[name+'_'+'Volume'] = np.log(regressors[name+'_'+'Volume'])
-        future[name + '_' + 'Open'] = np.log(regressors[name + '_' + 'Open'])
-        future[name + '_' + 'High'] = np.log(regressors[name + '_' + 'High'])
-        future[name + '_' + 'Low'] = np.log(regressors[name + '_' + 'Low'])
-        print('---')
-        print(future)
-        print('---')
-        forecast = m.predict(future)
-        print('1---')
-        print(forecast)
-        print('1---')
-        print(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail())
-        fig1 = m.plot(forecast)
-        fig2 = m.plot_components(forecast)
 
-        df_close = pd.DataFrame(df[['ds', 'y']]).set_index('ds')
-        print(df_close)
-        forecast_with_org_data = forecast.set_index('ds').join(df_close)
-        print(forecast_with_org_data)
+        df_log = df_data.copy()
+        df_log['y'] = np.log(df_data['y'])
+
+        regressors = {}
+        for r in using_regressors:
+            if r in df_data.columns.values:
+                o = LibFBProphet.__predict_single_var_future(df_data[['ds', r]].copy(), r, forecast_periods)
+                regressors[name + '_' + r] = pd.concat([df_data[r], o], ignore_index=True)
+                df_log[name + '_' + r] = np.log(df_data[r])
+                m.add_regressor(name + '_' + r)
+
+        with suppress_stdout_stderr():
+            m.fit(df_log)
+        future = m.make_future_dataframe(periods=forecast_periods)
+
+        for r in using_regressors:
+            if r in df_data.columns.values:
+                future[name + '_' + r] = np.log(regressors[name + '_' + r])
+
+        forecast = m.predict(future)
+
+        logging.debug(forecast)
+        logging.debug(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail())
+
+        train_close = pd.DataFrame(df_data[['ds', 'y']]).set_index('ds')
+        forecast_with_org_data = forecast.set_index('ds').join(train_close)
+
         forecast_with_org_data = forecast_with_org_data[['y', 'yhat', 'yhat_upper', 'yhat_lower']]
         forecast_with_org_data['yhat'] = np.exp(forecast_with_org_data.yhat)
         forecast_with_org_data['yhat_upper'] = np.exp(forecast_with_org_data.yhat_upper)
         forecast_with_org_data['yhat_lower'] = np.exp(forecast_with_org_data.yhat_lower)
-        forecast_with_org_data[['y', 'yhat', 'yhat_upper', 'yhat_lower']].plot(figsize=(8, 6))
-        print(forecast_with_org_data)
 
-        forecast_with_org_data_dropna = forecast_with_org_data.dropna()
-        forecast_with_org_data_dropna[['y', 'yhat']].plot(figsize=(8, 6))
+        if self.enable_plot:
+            m.plot(forecast)
+            m.plot_components(forecast)
+            forecast_with_org_data[['y', 'yhat', 'yhat_upper', 'yhat_lower']].plot(figsize=(8, 6))
 
-        # plt.show()
-
-        ae = (forecast_with_org_data_dropna['yhat'] - forecast_with_org_data_dropna['y'])
-        print(ae.describe())
-
-        print("MSE:",
-              metrics.mean_squared_error(forecast_with_org_data_dropna['yhat'][trainsize:df.shape[0]], test['y']))
-        print("MAE:",
-              metrics.mean_absolute_error(forecast_with_org_data_dropna['yhat'][trainsize:df.shape[0]], test['y']))
-
-        return NotImplemented
+        return forecast_with_org_data
 
     @staticmethod
     def __predict_single_var_future(df_data, header_name, forecast_periods):
@@ -117,32 +169,27 @@ class LibFBProphet(Model):
         df_data.rename(columns={header_name: 'y'}, inplace=True)
 
         df_log = df_data.copy()
-        df_log['y'] = np.log(df_log['y'])
+        df_log['y'] = np.log(df_data['y'])
 
         m = Prophet()
-        m.fit(df_log)
+        with suppress_stdout_stderr():
+            m.fit(df_log)
         future = m.make_future_dataframe(periods=forecast_periods)
         forecast = m.predict(future)
 
-        print(forecast.head())
-        print(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail())
-
-        # fig1 = m.plot(forecast)
-        # fig2 = m.plot_components(forecast)
+        logging.debug(forecast.head())
+        logging.debug(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail())
 
         df_close = pd.DataFrame(df_data[['ds', 'y']]).set_index('ds')
-        print(df_close)
+        logging.debug(df_close)
         forecast_with_org_data = forecast.set_index('ds').join(df_close)
-        print(forecast_with_org_data)
+        logging.debug(forecast_with_org_data)
         forecast_with_org_data = forecast_with_org_data[['y', 'yhat', 'yhat_upper', 'yhat_lower']]
         forecast_with_org_data['yhat'] = np.exp(forecast_with_org_data.yhat)
         forecast_with_org_data['yhat_upper'] = np.exp(forecast_with_org_data.yhat_upper)
         forecast_with_org_data['yhat_lower'] = np.exp(forecast_with_org_data.yhat_lower)
         forecast_with_org_data[['y', 'yhat', 'yhat_upper', 'yhat_lower']].plot(figsize=(8, 6))
-        print(forecast_with_org_data)
-        # plt.show()
+        logging.debug(forecast_with_org_data)
+
         forecast_with_org_data.rename(columns={'yhat': header_name}, inplace=True)
         return forecast_with_org_data[header_name][-1*forecast_periods:]
-
-    def __predict_future_with_add_regressors(self):
-        pass
