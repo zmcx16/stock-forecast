@@ -5,8 +5,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/fb_prophet.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/fb_prophet.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/model_abc.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/model_abc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/poc/fb_prophet_poc.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/validate_fb_prophet.py" beforeDir="false" afterPath="$PROJECT_DIR$/validate_fb_prophet.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,8 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="199">
-              <caret line="55" column="44" selection-start-line="55" selection-start-column="44" selection-end-line="55" selection-end-column="44" />
+            <state relative-caret-position="192">
+              <caret line="85" column="40" selection-start-line="85" selection-start-column="40" selection-end-line="85" selection-end-column="40" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -31,8 +30,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/validate_fb_prophet.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="401">
-              <caret line="61" column="23" selection-start-line="61" selection-start-column="23" selection-end-line="61" selection-end-column="23" />
+            <state relative-caret-position="61">
+              <caret line="45" column="46" selection-start-line="45" selection-start-column="46" selection-end-line="45" selection-end-column="46" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -61,8 +60,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/models/fb_prophet.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-207">
-              <caret line="92" selection-start-line="92" selection-end-line="92" />
+            <state relative-caret-position="287">
+              <caret line="82" column="46" lean-forward="true" selection-start-line="82" selection-start-column="40" selection-end-line="82" selection-end-column="46" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -73,7 +72,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://M:/ProgramData/Anaconda3/envs/py38-stockforecast/Lib/site-packages/sklearn/metrics/_regression.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
+            <state relative-caret-position="1501">
               <caret line="88" selection-start-line="88" selection-end-line="88" />
             </state>
           </provider>
@@ -82,7 +81,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://M:/ProgramData/Anaconda3/envs/py38-stockforecast/Lib/site-packages/sklearn/utils/validation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="19">
+            <state relative-caret-position="5909">
               <caret line="330" selection-start-line="330" selection-end-line="330" />
             </state>
           </provider>
@@ -109,8 +108,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/poc/fb_prophet_tr_ts_val.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="116">
-              <caret line="134" selection-start-line="134" selection-end-line="134" selection-end-column="67" />
+            <state relative-caret-position="912">
+              <caret line="61" selection-start-line="61" selection-end-line="61" selection-end-column="46" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -131,6 +130,7 @@
     <findStrings>
       <find>forecast_periods</find>
       <find>print</find>
+      <find>__run_model</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -144,15 +144,15 @@
         <option value="$PROJECT_DIR$/model/fb_prophet.py" />
         <option value="$PROJECT_DIR$/poc/fb_prophet_poc.py" />
         <option value="$PROJECT_DIR$/models/model_abc.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/validate_fb_prophet.py" />
         <option value="$PROJECT_DIR$/models/fb_prophet.py" />
+        <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
-    <option name="x" value="-52" />
-    <option name="width" value="1020" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-57" />
+    <option name="width" value="1026" />
     <option name="height" value="1040" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -313,8 +313,8 @@
     <frame x="-7" y="-7" width="1431" height="772" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7651163" visible="true" weight="0.24946237" />
-      <window_info id="Structure" order="1" sideWeight="0.23488373" side_tool="true" visible="true" weight="0.24946237" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.75581396" visible="true" weight="0.24946237" />
+      <window_info id="Structure" order="1" sideWeight="0.24418604" side_tool="true" visible="true" weight="0.24946237" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -355,34 +355,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://M:/ProgramData/Anaconda3/envs/py38-stockforecast/Lib/site-packages/pandas/core/indexing.py">
+    <entry file="file://M:/ProgramData/Anaconda3/envs/py38-stockforecast/Lib/site-packages/sklearn/metrics/_regression.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="24947">
-          <caret line="1376" selection-start-line="1376" selection-end-line="1376" />
+        <state relative-caret-position="1501">
+          <caret line="88" selection-start-line="88" selection-end-line="88" />
         </state>
       </provider>
     </entry>
     <entry file="file://M:/ProgramData/Anaconda3/envs/py38-stockforecast/Lib/site-packages/sklearn/utils/validation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19">
+        <state relative-caret-position="5909">
           <caret line="330" selection-start-line="330" selection-end-line="330" />
         </state>
       </provider>
     </entry>
-    <entry file="file://M:/ProgramData/Anaconda3/envs/py38-stockforecast/Lib/site-packages/sklearn/metrics/_regression.py">
+    <entry file="file://M:/ProgramData/Anaconda3/envs/py38-stockforecast/Lib/site-packages/pandas/core/indexing.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="88" selection-start-line="88" selection-end-line="88" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/poc/fb_prophet_tr_ts_val.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="116">
-          <caret line="134" selection-start-line="134" selection-end-line="134" selection-end-column="67" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="24947">
+          <caret line="1376" selection-start-line="1376" selection-end-line="1376" />
         </state>
       </provider>
     </entry>
@@ -393,10 +383,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/fb_prophet.py">
+    <entry file="file://$PROJECT_DIR$/poc/fb_prophet_tr_ts_val.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-207">
-          <caret line="92" selection-start-line="92" selection-end-line="92" />
+        <state relative-caret-position="912">
+          <caret line="61" selection-start-line="61" selection-end-line="61" selection-end-column="46" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
@@ -405,8 +395,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/validate_fb_prophet.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="61" column="23" selection-start-line="61" selection-start-column="23" selection-end-line="61" selection-end-column="23" />
+        <state relative-caret-position="61">
+          <caret line="45" column="46" selection-start-line="45" selection-start-column="46" selection-end-line="45" selection-end-column="46" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/fb_prophet.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="287">
+          <caret line="82" column="46" lean-forward="true" selection-start-line="82" selection-start-column="40" selection-end-line="82" selection-end-column="46" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
@@ -415,8 +415,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
-          <caret line="55" column="44" selection-start-line="55" selection-start-column="44" selection-end-line="55" selection-end-column="44" />
+        <state relative-caret-position="192">
+          <caret line="85" column="40" selection-start-line="85" selection-start-column="40" selection-end-line="85" selection-end-column="40" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>

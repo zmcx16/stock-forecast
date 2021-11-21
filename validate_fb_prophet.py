@@ -29,7 +29,8 @@ def prepare_model_data_for_stock(stock_path, name):
         data = {
             'args': {
                 'using_regressors': ['Open', 'High', 'Low', 'Volume'],
-                'train_ratio': train_ratio
+                'train_ratio': train_ratio,
+                'enable_plot': True
             },
             'target_data': {
                 'name': name,
@@ -42,7 +43,7 @@ def prepare_model_data_for_stock(stock_path, name):
 
 
 def main():
-
+    pd.set_option('display.max_columns', None)
     logging.basicConfig(level=logging.DEBUG)
 
     root_path = pathlib.Path(__file__).parent.resolve()
@@ -54,7 +55,7 @@ def main():
     model = LibFBProphet()
 
     # do fb_prophet forecast for single stock data
-    symbol = 'T'
+    symbol = 'KGC'
     stock_path = stock_historical_path / (symbol + ".json")
     stock_data = prepare_model_data_for_stock(stock_path, symbol)
     logging.debug(stock_data)

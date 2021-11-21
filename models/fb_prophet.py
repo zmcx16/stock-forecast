@@ -78,7 +78,9 @@ class LibFBProphet(Model):
 
         using_regressors = data['args']['using_regressors']
         name = data['target_data']['name']
-        df = data['target_data']['data']
+
+        # reverse data order from latest start -> oldest start
+        df = data['target_data']['data'][::-1]
 
         df.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
 
@@ -116,9 +118,13 @@ class LibFBProphet(Model):
         if self.enable_plot:
             plt.show()
 
-        logging.debug(forecast_with_org_data)
-
-        return NotImplemented
+        # rename
+        final_forecast = forecast_with_org_data.reset_index()
+        final_forecast.rename(
+            columns={'ds': 'Date', 'y': 'Close',
+                     'yhat': 'Predict', 'yhat_upper': 'Predict_Upper', 'yhat_lower': 'Predict_Lower',
+                     'trend': 'Trend', 'trend_upper': 'Trend_Upper', 'trend_lower': 'Trend_Lower'}, inplace=True)
+        return final_forecast
 
     def __run_model(self, df_data, using_regressors, forecast_periods, name):
 
@@ -151,7 +157,7 @@ class LibFBProphet(Model):
         train_close = pd.DataFrame(df_data[['ds', 'y']]).set_index('ds')
         forecast_with_org_data = forecast.set_index('ds').join(train_close)
 
-        forecast_with_org_data = forecast_with_org_data[['y', 'yhat', 'yhat_upper', 'yhat_lower']]
+        forecast_with_org_data = forecast_with_org_data[['y', 'yhat', 'yhat_upper', 'yhat_lower', 'trend', 'trend_upper', 'trend_lower']]
         forecast_with_org_data['yhat'] = np.exp(forecast_with_org_data.yhat)
         forecast_with_org_data['yhat_upper'] = np.exp(forecast_with_org_data.yhat_upper)
         forecast_with_org_data['yhat_lower'] = np.exp(forecast_with_org_data.yhat_lower)
