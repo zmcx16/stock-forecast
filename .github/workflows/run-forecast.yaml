@@ -45,7 +45,7 @@ jobs:
         python -m pip install -r ./master/requirements.txt
     - name: Run forecast
       run: |-
-        python ./master/fetch_stock_data.py
+        python ./master/main.py
     - name: Copy forecast_output
       run: |-
         cp -r ./master/forecast_output ./
