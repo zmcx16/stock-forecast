@@ -24,6 +24,12 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
+    - name: Copy master folder
+      run: |-
+        rsync -Rr ./ ./master/
+    - name: Checkout data branch
+      run: |-
+        git checkout data
     - name: Download norn-data
       uses: actions/checkout@v2
       with:
@@ -32,14 +38,8 @@ jobs:
         path: './Norn-StockScreener'
     - name: Delete dataset folder & move norn-data to dataset
       run: |-
-        rm -rf ./dataset
-        mv ./Norn-StockScreener/norn-data ./dataset
-    - name: Copy master folder
-      run: |-
-        rsync -Rr ./ ./master/
-    - name: Checkout data branch
-      run: |-
-        git checkout data
+        rm -rf ./master/dataset
+        mv ./Norn-StockScreener/norn-data ./master/dataset
     - name: Install Python dependencies
       run: |
         python -m pip install -r ./master/requirements.txt
