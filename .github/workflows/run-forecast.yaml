@@ -17,17 +17,22 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
-    - uses: actions/cache@v2
-      name: Configure pip caching
+    - name: Configure pip caching
+      uses: actions/cache@v2
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - name: Delete dataset folder, download norn-data into dataset folder
+    - name: Download norn-data
+      uses: actions/checkout@v2
+      with:
+        ref: gh-pages
+        repository: zmcx16/Norn-StockScreener
+        path: './Norn-StockScreener'
+    - name: Delete dataset folder & move norn-data to dataset
       run: |-
         rm -rf ./dataset
-        git clone --single-branch --branch gh-pages git@github.com:zmcx16/Norn-StockScreener.git
         mv ./Norn-StockScreener/norn-data ./dataset
     - name: Copy master folder
       run: |-
