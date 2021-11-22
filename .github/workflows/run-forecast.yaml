@@ -26,7 +26,7 @@ jobs:
           ${{ runner.os }}-pip-
     - name: Copy master folder
       run: |-
-        cp -r ./ ./master
+        rsync -Rr ./ ./master/
     - name: Checkout data branch
       run: |-
         git checkout data
