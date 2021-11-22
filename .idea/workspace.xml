@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="07c75ed3-6c5b-4771-b78d-b19a8aab476d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/fb_prophet.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/fb_prophet.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/validate_fb_prophet.py" beforeDir="false" afterPath="$PROJECT_DIR$/validate_fb_prophet.py" afterDir="false" />
-    </list>
+    <list default="true" id="07c75ed3-6c5b-4771-b78d-b19a8aab476d" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,7 +13,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="192">
+            <state relative-caret-position="270">
               <caret line="85" column="40" selection-start-line="85" selection-start-column="40" selection-end-line="85" selection-end-column="40" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
@@ -311,14 +306,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1431" height="772" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.75581396" visible="true" weight="0.24946237" />
-      <window_info id="Structure" order="1" sideWeight="0.24418604" side_tool="true" visible="true" weight="0.24946237" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.75663024" visible="true" weight="0.24946237" />
+      <window_info id="Structure" order="1" sideWeight="0.24336973" side_tool="true" visible="true" weight="0.24946237" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49964157" visible="true" weight="0.32917318" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49964157" weight="0.32917318" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39937598" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -415,7 +409,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
+        <state relative-caret-position="270">
           <caret line="85" column="40" selection-start-line="85" selection-start-column="40" selection-end-line="85" selection-end-column="40" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
