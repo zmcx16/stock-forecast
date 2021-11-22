@@ -24,6 +24,11 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
+    - name: Delete dataset folder, download norn-data into dataset folder
+      run: |-
+        rm -rf ./dataset
+        git clone --single-branch --branch gh-pages git@github.com:zmcx16/Norn-StockScreener.git
+        mv ./Norn-StockScreener/norn-data ./dataset
     - name: Copy master folder
       run: |-
         rsync -Rr ./ ./master/
