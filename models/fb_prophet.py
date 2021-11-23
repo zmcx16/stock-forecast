@@ -194,7 +194,7 @@ class LibFBProphet(Model):
         forecast_with_org_data['yhat'] = np.exp(forecast_with_org_data.yhat)
         forecast_with_org_data['yhat_upper'] = np.exp(forecast_with_org_data.yhat_upper)
         forecast_with_org_data['yhat_lower'] = np.exp(forecast_with_org_data.yhat_lower)
-        forecast_with_org_data[['y', 'yhat', 'yhat_upper', 'yhat_lower']].plot(figsize=(8, 6))
+        # forecast_with_org_data[['y', 'yhat', 'yhat_upper', 'yhat_lower']].plot(figsize=(8, 6))
         logging.debug(forecast_with_org_data)
 
         forecast_with_org_data.rename(columns={'yhat': header_name}, inplace=True)
