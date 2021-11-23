@@ -70,7 +70,7 @@ class LibFBProphet(Model):
 
     def run_validate(self, data):
 
-        logging.info(data['args'])
+        logging.debug(data['args'])
         if 'enable_plot' in data['args']:
             self.enable_plot = data['args']['enable_plot']
         if 'train_ratio' in data['args']:
@@ -102,7 +102,7 @@ class LibFBProphet(Model):
 
     def run_predict(self, data):
 
-        logging.info(data['args'])
+        logging.debug(data['args'])
         if 'enable_plot' in data['args']:
             self.enable_plot = data['args']['enable_plot']
 
