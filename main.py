@@ -1,24 +1,10 @@
 import os
-import sys
-import base64
 import pathlib
 import json
-import requests
-import csv
-import threading
-import queue
-import time
 import logging
 
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
-from prophet import Prophet
-from sklearn import metrics
-from urllib.parse import urlencode
-from datetime import datetime, timedelta
-
+from datetime import datetime
 from models.fb_prophet import LibFBProphet
 
 forecast_periods = 30
@@ -53,7 +39,7 @@ def prepare_model_data_for_stock(stock_path, name):
 
 def main():
     pd.set_option('display.max_columns', None)
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
     root_path = pathlib.Path(__file__).parent.resolve()
     dataset_path = root_path / "dataset"
@@ -72,10 +58,11 @@ def main():
     symbol_list = get_all_stock_symbol(stock_stat_path)
     logging.info(symbol_list)
 
-    output_table = {'update_time': str(datetime.now()), "data": {}}
+    output_table = {'update_time': str(datetime.now()), 'data': {}}
     # do fb_prophet forecast for single stock data
     for symbol in symbol_list:
-        stock_path = stock_historical_path / ('T' + ".json")
+        logging.info('{} stock forecast start'.format(symbol))
+        stock_path = stock_historical_path / ('T' + '.json')
         stock_data = prepare_model_data_for_stock(stock_path, symbol)
         logging.debug(stock_data)
 
@@ -86,10 +73,24 @@ def main():
         forecast_json = forecast.to_dict(orient='records')
         logging.debug(forecast_json)
 
-        with open(stock_fbprophet_ohlv_path / (symbol + '.json'), 'w', encoding='utf-8') as f:
-            f.write(json.dumps(forecast_json, separators=(',', ':')))
+        fcst = {'FCST': '-', 'FCST_Upper' + str(forecast_periods): '-',
+                                            'FCST_Lower' + str(forecast_periods): '-'}
+        if len(forecast_json) > 0:
+            fcst['FCST'] = round(forecast_json[0]['Predict'], 3)
+            fcst['FCST_Upper' + str(forecast_periods)] = round(forecast_json[0]['Predict_Upper'], 3)
+            fcst['FCST_Lower' + str(forecast_periods)] = round(forecast_json[0]['Predict_Lower'], 3)
 
-        break
+        output_table['data'][symbol] = fcst
+
+        with open(stock_fbprophet_ohlv_path / (symbol + '.json'), 'w', encoding='utf-8') as f:
+            f.write(json.dumps(forecast_json, separators=(',', ':')).replace('NaN', '"-"'))
+
+        logging.info('{} stock forecast done'.format(symbol))
+
+    with open(output_path / 'stock_fbprophet_ohlv.json', 'w', encoding='utf-8') as f:
+        f.write(json.dumps(output_table, separators=(',', ':')))
+
+    logging.info('main done')
 
 
 if __name__ == "__main__":
