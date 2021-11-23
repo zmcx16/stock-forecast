@@ -110,9 +110,14 @@ def main():
     logging.info(symbol_list)
 
     task_queue = queue.Queue()
+
+    i = 0
     for symbol in symbol_list:
         data = {"symbol": symbol}
         task_queue.put(data)
+        i = i+1
+        if i > 600:
+            break
 
     work_list = []
     for index in range(max_thread):
