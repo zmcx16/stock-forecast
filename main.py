@@ -62,7 +62,7 @@ def main():
     # do fb_prophet forecast for single stock data
     for symbol in symbol_list:
         logging.info('{} stock forecast start'.format(symbol))
-        stock_path = stock_historical_path / ('T' + '.json')
+        stock_path = stock_historical_path / (symbol + '.json')
         stock_data = prepare_model_data_for_stock(stock_path, symbol)
         logging.debug(stock_data)
 
