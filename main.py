@@ -23,21 +23,19 @@ def get_all_stock_symbol(stat_path):
     return symbol_list
 
 
-def prepare_model_data_for_stock(stock_path, name):
-    with open(stock_path, 'r', encoding='utf-8') as f:
-        data = {
-            'args': {
-                'using_regressors': ['Open', 'High', 'Low', 'Volume'],
-                'forecast_periods': forecast_periods
-            },
-            'target_data': {
-                'name': name,
-                'data': pd.read_json(f.read(), orient='records'),
-                'type': 'stock'
-            },
-            'feature_data': []
-        }
-        return data
+def prepare_model_data_for_stock(stock_data, name):
+    return {
+        'args': {
+            'using_regressors': ['Open', 'High', 'Low', 'Volume'],
+            'forecast_periods': forecast_periods
+        },
+        'target_data': {
+            'name': name,
+            'data': pd.read_json(stock_data, orient='records'),
+            'type': 'stock'
+        },
+        'feature_data': []
+    }
 
 
 class FBProphetThread(threading.Thread):
@@ -49,7 +47,17 @@ class FBProphetThread(threading.Thread):
         self.stock_fbprophet_ohlv_path = stock_fbprophet_ohlv_path
         self.task_queue = task_queue
         self.output_table = {}
-        self.model = LibFBProphet()
+
+    @staticmethod
+    def run_fb_prophet(stock_data, name):
+        model = LibFBProphet()
+        model_input = prepare_model_data_for_stock(stock_data, name)
+        logging.debug(model_input)
+        forecast = model.run_predict(model_input)
+        logging.debug(forecast)
+        forecast['Date'] = forecast['Date'].apply(lambda x: x.strftime('%m/%d/%Y'))
+        forecast = forecast[::-1]  # reverse to latest order
+        return forecast.to_dict(orient='records')
 
     def run(self):
         logging.info("Thread{} start".format(self.id))
@@ -60,14 +68,9 @@ class FBProphetThread(threading.Thread):
 
                 logging.info('{} stock forecast start'.format(symbol))
                 stock_path = self.stock_historical_path / (symbol + '.json')
-                stock_data = prepare_model_data_for_stock(stock_path, symbol)
-                logging.debug(stock_data)
+                with open(stock_path, 'r', encoding='utf-8') as f:
+                    forecast_json = FBProphetThread.run_fb_prophet(f.read(), symbol)
 
-                forecast = self.model.run_predict(stock_data)
-                logging.debug(forecast)
-                forecast['Date'] = forecast['Date'].apply(lambda x: x.strftime('%m/%d/%Y'))
-                forecast = forecast[::-1]  # reverse to latest order
-                forecast_json = forecast.to_dict(orient='records')
                 logging.debug(forecast_json)
 
                 fcst = {'FCST': '-', 'FCST_Upper' + str(forecast_periods): '-',
@@ -88,6 +91,37 @@ class FBProphetThread(threading.Thread):
                 logging.error('Generated an exception: {ex}'.format(ex=ex))
 
         logging.info("Thread{} end".format(self.id))
+
+
+def gcp_api_main(request):
+    """Responds to any HTTP request.
+    Args:
+        request (flask.Request): HTTP request object.
+    Returns:
+        The response text or any set of values that can be turned into a
+        Response object using
+        `make_response <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>`.
+    """
+
+    logging.basicConfig(level=logging.INFO)
+    try:
+        request_json = request.get_json()
+        if request.args and 'message' in request.args:
+            return request.args.get('message')
+        elif request_json and 'message' in request_json:
+            return request_json['message']
+        elif request_json and 'stock_data' in request_json and 'name' in request_json:
+            logging.info('run_fb_prophet')
+            return json.dumps(
+                FBProphetThread.run_fb_prophet(
+                    json.dumps(request_json['stock_data']), request_json['name'])).replace('NaN', '"-"')
+        else:
+            return f'Hello World!'
+
+    except Exception as ex:
+        err_msg = 'Generated an exception: {ex}'.format(ex=ex)
+        logging.error(err_msg)
+        return err_msg
 
 
 def main():
@@ -111,13 +145,9 @@ def main():
 
     task_queue = queue.Queue()
 
-    i = 0
     for symbol in symbol_list:
         data = {"symbol": symbol}
         task_queue.put(data)
-        i = i+1
-        if i > 600:
-            break
 
     work_list = []
     for index in range(max_thread):

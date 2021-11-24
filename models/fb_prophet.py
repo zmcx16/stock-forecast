@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from prophet import Prophet
-from sklearn import metrics
+# from sklearn import metrics  # gcp cloud function deploy failed due to import sklearn...
 
 from models.model_abc import Model
 
@@ -93,10 +93,10 @@ class LibFBProphet(Model):
         if self.enable_plot:
             plt.show()
 
-        logging.info("MSE: {}".format(
-              metrics.mean_squared_error(forecast_with_org_data['yhat'][train_size:df.shape[0]], test_data['y'])))
-        logging.info("MAE: {}".format(
-              metrics.mean_absolute_error(forecast_with_org_data['yhat'][train_size:df.shape[0]], test_data['y'])))
+        # logging.info("MSE: {}".format(
+        #       metrics.mean_squared_error(forecast_with_org_data['yhat'][train_size:df.shape[0]], test_data['y'])))
+        # logging.info("MAE: {}".format(
+        #       metrics.mean_absolute_error(forecast_with_org_data['yhat'][train_size:df.shape[0]], test_data['y'])))
 
         return NotImplemented
 
