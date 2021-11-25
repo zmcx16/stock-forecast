@@ -21,7 +21,7 @@ def send_post_json(url, req_data):
         res = requests.post(url, req_data, headers=headers)
         res.raise_for_status()
     except Exception as ex:
-        print('Generated an exception: {ex}'.format(ex=ex))
+        logging.error('Generated an exception: {ex}'.format(ex=ex))
         return -1, ex
 
     return 0, res.json()
@@ -184,7 +184,7 @@ def main():
     output_table = {'update_time': str(datetime.now()), 'data': {}}
     for worker in work_list:
         for k in worker.output_table:
-            output_table[k] = worker.output_table[k]
+            output_table['data'][k] = worker.output_table[k]
 
     with open(output_path / 'stock_fbprophet_ohlv.json', 'w', encoding='utf-8') as f:
         f.write(json.dumps(output_table, separators=(',', ':')))
