@@ -3,6 +3,7 @@ import pathlib
 import json
 import logging
 import threading
+import requests
 import queue
 
 import pandas as pd
@@ -10,7 +11,20 @@ from datetime import datetime
 from models.fb_prophet import LibFBProphet
 
 forecast_periods = 30
-max_thread = 4
+max_thread = 16
+gcp_url = os.environ.get("GCP_URL", "")
+
+
+def send_post_json(url, req_data):
+    try:
+        headers = {'content-type': 'application/json'}
+        res = requests.post(url, req_data, headers=headers)
+        res.raise_for_status()
+    except Exception as ex:
+        print('Generated an exception: {ex}'.format(ex=ex))
+        return -1, ex
+
+    return 0, res.json()
 
 
 def get_all_stock_symbol(stat_path):
@@ -40,13 +54,14 @@ def prepare_model_data_for_stock(stock_data, name):
 
 class FBProphetThread(threading.Thread):
 
-    def __init__(self, id, stock_historical_path, stock_fbprophet_ohlv_path, task_queue):
+    def __init__(self, id, stock_historical_path, stock_fbprophet_ohlv_path, task_queue, gcp_url):
         threading.Thread.__init__(self)
         self.id = id
         self.stock_historical_path = stock_historical_path
         self.stock_fbprophet_ohlv_path = stock_fbprophet_ohlv_path
         self.task_queue = task_queue
         self.output_table = {}
+        self.gcp_url = gcp_url
 
     @staticmethod
     def run_fb_prophet(stock_data, name):
@@ -69,7 +84,15 @@ class FBProphetThread(threading.Thread):
                 logging.info('{} stock forecast start'.format(symbol))
                 stock_path = self.stock_historical_path / (symbol + '.json')
                 with open(stock_path, 'r', encoding='utf-8') as f:
-                    forecast_json = FBProphetThread.run_fb_prophet(f.read(), symbol)
+                    d = f.read()
+                    if self.gcp_url != '':
+                        gcp_api_input = {'name': symbol, 'stock_data': json.loads(d)}
+                        ret, forecast_json = send_post_json(gcp_url, json.dumps(gcp_api_input))
+                        if ret != 0:
+                            logging.error('send_post_json failed: {ret}'.format(ret=ret))
+                            continue
+                    else:
+                        forecast_json = FBProphetThread.run_fb_prophet(d, symbol)
 
                 logging.debug(forecast_json)
 
@@ -151,7 +174,7 @@ def main():
 
     work_list = []
     for index in range(max_thread):
-        work_list.append(FBProphetThread(index, stock_historical_path, stock_fbprophet_ohlv_path, task_queue))
+        work_list.append(FBProphetThread(index, stock_historical_path, stock_fbprophet_ohlv_path, task_queue, gcp_url))
         work_list[index].start()
 
     for worker in work_list:
