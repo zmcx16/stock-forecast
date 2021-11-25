@@ -11,7 +11,7 @@ from datetime import datetime
 from models.fb_prophet import LibFBProphet
 
 forecast_periods = 30
-max_thread = 16
+max_thread = 32
 gcp_url = os.environ.get("GCP_URL", "")
 
 
