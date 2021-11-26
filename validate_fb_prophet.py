@@ -1,23 +1,6 @@
-import os
-import sys
-import base64
 import pathlib
-import json
-import requests
-import csv
-import threading
-import queue
-import time
 import logging
-
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
-from prophet import Prophet
-from sklearn import metrics
-from urllib.parse import urlencode
-from datetime import datetime, timedelta
 
 from models.fb_prophet import LibFBProphet
 
@@ -55,7 +38,7 @@ def main():
     model = LibFBProphet()
 
     # do fb_prophet forecast for single stock data
-    symbol = 'KGC'
+    symbol = 'AAPL'
     stock_path = stock_historical_path / (symbol + ".json")
     stock_data = prepare_model_data_for_stock(stock_path, symbol)
     logging.debug(stock_data)
