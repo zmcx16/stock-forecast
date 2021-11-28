@@ -73,7 +73,7 @@ class FBProphetThread(threading.Thread):
                 if not os.path.exists(output_folder):
                     os.makedirs(output_folder)
 
-                logging.info('{} stock forecast start'.format(symbol))
+                logging.info('{} stock {} forecast start'.format(symbol, task_type))
                 if self.gcp_url != '':
                     ret, forecast_json = send_post_json(gcp_url, json.dumps(model_input))
                     if ret != 0:
@@ -96,7 +96,7 @@ class FBProphetThread(threading.Thread):
                 with open(output_folder / (symbol + '.json'), 'w', encoding='utf-8') as f:
                     f.write(json.dumps(forecast_json, separators=(',', ':')).replace('NaN', '"-"'))
 
-                logging.info('{} stock forecast done'.format(symbol))
+                logging.info('{} stock {} forecast done'.format(symbol, task_type))
 
             except Exception as ex:
                 logging.error('Generated an exception: {ex}'.format(ex=ex))
