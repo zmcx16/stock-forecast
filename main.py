@@ -10,7 +10,7 @@ import pandas as pd
 from datetime import datetime
 from models.fb_prophet import LibFBProphet
 
-max_thread = 64
+max_thread = 2
 gcp_url = os.environ.get("GCP_URL", "")
 
 
