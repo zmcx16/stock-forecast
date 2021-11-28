@@ -151,7 +151,9 @@ def main():
     task_queue = queue.Queue()
 
     with open(forecast_config_path, 'r', encoding='utf-8') as f:
-        forecast_config = json.loads(f.read())
+        c = f.read()
+        logging.info(c)
+        forecast_config = json.loads(c)
         for symbol in forecast_config:
             for model_input in forecast_config[symbol]:
                 model_input["target_data"]["file_path"] = \
