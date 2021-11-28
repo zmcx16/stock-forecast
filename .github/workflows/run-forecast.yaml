@@ -41,7 +41,7 @@ jobs:
     - name: Update forecast_config.json
       uses: wei/wget@v1
       with:
-        args: -O ./master/forecast_config.json https://github.com/zmcx16/zmcx16.github.io/blob/master/plugin-react/forecast_config.json
+        args: -O ./master/forecast_config.json https://raw.githubusercontent.com/zmcx16/zmcx16.github.io/master/plugin-react/forecast_config.json
     - name: Install Python dependencies
       run: |
         python -m pip install -r ./master/requirements.txt
