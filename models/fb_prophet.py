@@ -57,6 +57,7 @@ class LibFBProphet(Model):
     #       'target_data': {
     #           'name': 'name'
     #           'data': obj      # dataframe
+    #           'file_path': '{data path}' # use it if no data key
     #           'type': 'stock'  # stock or market
     #       },
     #       'feature_data': [
@@ -78,6 +79,9 @@ class LibFBProphet(Model):
 
         using_regressors = data['args']['using_regressors']
         name = data['target_data']['name']
+
+        if 'data' not in data['target_data']:
+            data['target_data']['data'] = pd.read_json(data['target_data']['file_path'], orient='records')
 
         # reverse data order from latest start -> oldest start
         df = data['target_data']['data'][::-1]
@@ -109,6 +113,10 @@ class LibFBProphet(Model):
         using_regressors = data['args']['using_regressors']
         forecast_periods = data['args']['forecast_periods']
         name = data['target_data']['name']
+
+        if 'data' not in data['target_data']:
+            data['target_data']['data'] = pd.read_json(data['target_data']['file_path'], orient='records')
+
         df = data['target_data']['data']
 
         df.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)

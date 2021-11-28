@@ -38,12 +38,16 @@ jobs:
       run: |-
         rm -rf ./master/dataset
         mv ./Norn-StockScreener/norn-data ./master/dataset
+    - name: Update forecast_config.json
+      uses: wei/wget@v1
+      with:
+        args: -O ./master/forecast_config.json https://github.com/zmcx16/zmcx16.github.io/blob/master/plugin-react/forecast_config.json
     - name: Install Python dependencies
       run: |
         python -m pip install -r ./master/requirements.txt
     - name: Run forecast
       env:
-        GCP_URL: ${{ secrets.GCP_URL }}
+        # GCP_URL: ${{ secrets.GCP_URL }}
       run: |-
         python ./master/main.py
     - name: Copy forecast_output
