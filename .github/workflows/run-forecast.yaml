@@ -70,8 +70,9 @@ jobs:
         path: ./zmcx16.github.io
     - name: Copy forecast-data & push zmcx16.github.io
       run: |-
-        cp -r ./forecast_output/\* ./zmcx16.github.io/forecast-data
+        cp -r ./forecast_output ./zmcx16.github.io/
         cd ./zmcx16.github.io
+        mv forecast_output forecast-data
         git config --global user.name "zmcx16-bot"
         git add ./forecast-data/\* && git commit -m "updated forecast-data"
         git push
