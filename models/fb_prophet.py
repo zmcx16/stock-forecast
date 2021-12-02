@@ -117,7 +117,8 @@ class LibFBProphet(Model):
         if 'data' not in data['target_data']:
             data['target_data']['data'] = pd.read_json(data['target_data']['file_path'], orient='records')
 
-        df = data['target_data']['data']
+        # reverse data order from latest start -> oldest start
+        df = data['target_data']['data'][::-1]
 
         df.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
 
