@@ -74,6 +74,7 @@ jobs:
       run: |-
         cp -r ./forecast_output ./zmcx16.github.io/
         cd ./zmcx16.github.io
+        rm -rf forecast-data
         mv forecast_output forecast-data
         git config --global user.name "zmcx16-bot"
         git add ./forecast-data/\* && git commit -m "updated forecast-data"
