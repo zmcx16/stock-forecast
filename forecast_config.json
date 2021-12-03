@@ -57,5 +57,23 @@
             
          ]
       }
+   ],
+   "bloomberg_BDIY_IND":[
+      {
+         "type":"market_fbprophet_empty",
+         "algorithm":"fbprophet",
+         "args":{
+            "using_regressors":[],
+            "forecast_periods":30
+         },
+         "target_data":{
+            "name":"bloomberg_BDIY_IND",
+            "file_path":"markets/historical-quotes/bloomberg_BDIY_IND.json",
+            "type":"market"
+         },
+         "feature_data":[
+
+         ]
+      }
    ]
 }

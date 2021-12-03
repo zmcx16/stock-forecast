@@ -1,5 +1,6 @@
 import os
 import logging
+import json
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -81,7 +82,15 @@ class LibFBProphet(Model):
         name = data['target_data']['name']
 
         if 'data' not in data['target_data']:
-            data['target_data']['data'] = pd.read_json(data['target_data']['file_path'], orient='records')
+            if data['target_data']['type'] == 'stock':
+                data['target_data']['data'] = pd.read_json(data['target_data']['file_path'], orient='records')
+            elif data['target_data']['type'] == 'market':
+                with open(data['target_data']['file_path'], 'r', encoding='utf-8') as f:
+                    market_data = json.loads(f.read())
+                    market_data_records = json.dumps(market_data['data'])
+                    data['target_data']['data'] = pd.read_json(market_data_records, orient='records')
+            else:
+                logging.error('not support data type')
 
         # reverse data order from latest start -> oldest start
         df = data['target_data']['data'][::-1]
@@ -115,7 +124,15 @@ class LibFBProphet(Model):
         name = data['target_data']['name']
 
         if 'data' not in data['target_data']:
-            data['target_data']['data'] = pd.read_json(data['target_data']['file_path'], orient='records')
+            if data['target_data']['type'] == 'stock':
+                data['target_data']['data'] = pd.read_json(data['target_data']['file_path'], orient='records')
+            elif data['target_data']['type'] == 'market':
+                with open(data['target_data']['file_path'], 'r', encoding='utf-8') as f:
+                    market_data = json.loads(f.read())
+                    market_data_records = json.dumps(market_data['data'])
+                    data['target_data']['data'] = pd.read_json(market_data_records, orient='records')
+            else:
+                logging.error('not support data type')
 
         # reverse data order from latest start -> oldest start
         df = data['target_data']['data'][::-1]
