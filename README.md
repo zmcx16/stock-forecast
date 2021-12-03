@@ -4,10 +4,16 @@
 
 Do Stocks / Markets price prediction on the time series prediction model
 
-# Support Model
+# Forecast Model
 * FB Prophet
 
+# Dataset
+* US Stocks
+
 # Demo
+https://project.zmcx16.moe/?page=investment-forecast
+
+![image](https://github.com/zmcx16/stock-forecast/blob/master/demo/website.png)
 
 ![image](https://github.com/zmcx16/stock-forecast/blob/master/demo/demo1.png)
 
