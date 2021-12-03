@@ -40,6 +40,9 @@ jobs:
       run: |-
         rm -rf ./master/dataset
         mv ./Norn-StockScreener/norn-data ./master/dataset
+        mv ./master/dataset/markets ./master/dataset/historical-quotes 
+        mkdir ./master/dataset/markets
+        mv ./master/dataset/historical-quotes ./master/dataset/markets/historical-quotes
     - name: Update forecast_config.json
       uses: wei/wget@v1
       with:
