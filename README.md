@@ -9,6 +9,7 @@ Do Stocks / Markets price prediction on the time series prediction model
 
 # Dataset
 * US Stocks
+* Markets
 
 # Demo
 https://project.zmcx16.moe/?page=investment-forecast
