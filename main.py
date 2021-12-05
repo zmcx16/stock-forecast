@@ -158,6 +158,9 @@ def main():
             for model_input in forecast_config[symbol]:
                 model_input["target_data"]["file_path"] = \
                     dataset_path / model_input["target_data"]["file_path"]
+                for model_features in model_input["feature_data"]:
+                    model_features["file_path"] = \
+                        dataset_path / model_features["file_path"]
 
                 task_queue.put({"symbol": symbol, "model_input": model_input})
 

@@ -63,12 +63,29 @@ class LibFBProphet(Model):
     #       },
     #       'feature_data': [
     #           {
+    #               'using_regressors': ['Open', 'High', 'Low', 'Volume']
     #               'name': 'name'
     #               'data': obj      # dataframe
+    #               'file_path': '{data path}' # use it if no data key
     #               'type': 'stock'  # stock or market
     #           }
     #       ]
     #   }
+
+    @staticmethod
+    def __load_data(target_or_feature_data):
+        if 'data' not in target_or_feature_data:
+            if target_or_feature_data['type'] == 'stock':
+                return pd.read_json(target_or_feature_data['file_path'], orient='records')
+            elif target_or_feature_data['type'] == 'market':
+                with open(target_or_feature_data['file_path'], 'r', encoding='utf-8') as f:
+                    market_data = json.loads(f.read())
+                    market_data_records = json.dumps(market_data['data'])
+                    return pd.read_json(market_data_records, orient='records')
+            else:
+                logging.error('not support data type')
+
+        return None
 
     def run_validate(self, data):
 
@@ -81,19 +98,21 @@ class LibFBProphet(Model):
         using_regressors = data['args']['using_regressors']
         name = data['target_data']['name']
 
-        if 'data' not in data['target_data']:
-            if data['target_data']['type'] == 'stock':
-                data['target_data']['data'] = pd.read_json(data['target_data']['file_path'], orient='records')
-            elif data['target_data']['type'] == 'market':
-                with open(data['target_data']['file_path'], 'r', encoding='utf-8') as f:
-                    market_data = json.loads(f.read())
-                    market_data_records = json.dumps(market_data['data'])
-                    data['target_data']['data'] = pd.read_json(market_data_records, orient='records')
-            else:
-                logging.error('not support data type')
+
+        # load target_data with df
+        df_data = LibFBProphet.__load_data(data['target_data'])
+        for feature_data in data['feature_data']:
+            df_feat_data = LibFBProphet.__load_data(feature_data)
+            for col in df_feat_data.columns:
+                if col in feature_data['using_regressors']:
+                    new_col_name = 'feat_' + feature_data['name'] + '_' + col
+                    using_regressors.append(new_col_name)
+                    df_feat_data.rename(columns={col: new_col_name}, inplace=True)
+
+            df_data = df_data.merge(df_feat_data, on='Date', how='left').dropna()
 
         # reverse data order from latest start -> oldest start
-        df = data['target_data']['data'][::-1]
+        df = df_data[::-1]
 
         df.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
 
@@ -123,19 +142,20 @@ class LibFBProphet(Model):
         forecast_periods = data['args']['forecast_periods']
         name = data['target_data']['name']
 
-        if 'data' not in data['target_data']:
-            if data['target_data']['type'] == 'stock':
-                data['target_data']['data'] = pd.read_json(data['target_data']['file_path'], orient='records')
-            elif data['target_data']['type'] == 'market':
-                with open(data['target_data']['file_path'], 'r', encoding='utf-8') as f:
-                    market_data = json.loads(f.read())
-                    market_data_records = json.dumps(market_data['data'])
-                    data['target_data']['data'] = pd.read_json(market_data_records, orient='records')
-            else:
-                logging.error('not support data type')
+        # load target_data with df
+        df_data = LibFBProphet.__load_data(data['target_data'])
+        for feature_data in data['feature_data']:
+            df_feat_data = LibFBProphet.__load_data(feature_data)
+            for col in df_feat_data.columns:
+                if col in feature_data['using_regressors']:
+                    new_col_name = 'feat_' + feature_data['name'] + '_' + col
+                    using_regressors.append(new_col_name)
+                    df_feat_data.rename(columns={col: new_col_name}, inplace=True)
+
+            df_data = df_data.merge(df_feat_data, on='Date', how='left').dropna()
 
         # reverse data order from latest start -> oldest start
-        df = data['target_data']['data'][::-1]
+        df = df_data[::-1]
 
         df.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
 
