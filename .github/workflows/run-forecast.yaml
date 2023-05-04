@@ -17,7 +17,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
-        pip: '23.0.1'
     - name: Configure pip caching
       uses: actions/cache@v2
       with:
@@ -50,6 +49,7 @@ jobs:
         args: -O ./master/forecast_config.json https://raw.githubusercontent.com/zmcx16/zmcx16.github.io/master/plugin-react/forecast_config.json
     - name: Install Python dependencies
       run: |
+        python -m pip install pip==23.0.1
         python -m pip install -r ./master/requirements.txt --use-pep517
     - name: Run forecast
       # env:
