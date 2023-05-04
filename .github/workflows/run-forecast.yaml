@@ -3,7 +3,7 @@ name: FetchStockData
 on:
   workflow_dispatch:
   schedule:
-    - cron:  '0 3 * * *'
+    - cron:  '20 4 * * *'
 jobs:
   build:
     runs-on: ubuntu-latest
