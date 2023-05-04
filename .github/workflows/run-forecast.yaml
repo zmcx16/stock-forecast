@@ -17,6 +17,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+        pip: '23.0.1'
     - name: Configure pip caching
       uses: actions/cache@v2
       with:
