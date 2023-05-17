@@ -50,6 +50,8 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install -r ./master/requirements.txt --use-pep517
+        pip uninstall holidays -y
+        pin install holidays==0.24
     - name: Run forecast
       # env:
       # GCP_URL: ${{ secrets.GCP_URL }}
